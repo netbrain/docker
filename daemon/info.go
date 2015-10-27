@@ -63,9 +63,24 @@ func (daemon *Daemon) SystemInfo() (*types.Info, error) {
 
 	sysInfo := sysinfo.New(true)
 
+	var cRunning, cPaused, cStopped int
+	for _, c := range daemon.List() {
+		if c.IsRunning() {
+			cRunning++
+		} else if c.isPaused() {
+			cPaused++
+		} else {
+			cStopped++
+		}
+
+	}
+
 	v := &types.Info{
 		ID:                 daemon.ID,
 		Containers:         len(daemon.List()),
+		ContainersRunning:  cRunning,
+		ContainersPaused:   cPaused,
+		ContainersStopped:  cStopped,
 		Images:             imgcount,
 		Driver:             daemon.GraphDriver().String(),
 		DriverStatus:       daemon.GraphDriver().Status(),
